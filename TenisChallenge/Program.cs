@@ -14,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PlayersContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection"),
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DbConnectionProduction"),
     npgsqlOptions => npgsqlOptions.MigrationsAssembly("TenisChallenge.WebApi"));
 });
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();

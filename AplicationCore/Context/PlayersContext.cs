@@ -18,5 +18,16 @@ namespace AplicationCore.Context
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Players>(entity=>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .UseIdentityColumn();
+            }
+            
+            );
+        }
     }
 }

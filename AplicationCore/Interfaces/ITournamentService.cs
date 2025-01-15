@@ -11,6 +11,8 @@ namespace AplicationCore.Interfaces
     {
         Task<bool> RegisterPlayersAsync(List<Players> players);
         Players SimulateTournament(List<Players> players);
-        
+        Task GetPlayersAsync();
+        Task UpdateAsync(Players player);
+        Task DeleteAsync(int id);
     }
 }

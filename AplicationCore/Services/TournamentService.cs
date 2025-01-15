@@ -18,6 +18,17 @@ namespace AplicationCore.Services
             _playerRepository = playerRepository;
         }
 
+        public Task DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task GetPlayersAsync()
+        {
+            List<Players> lsPlayer = new List<Players>();
+            var listPlayer = await _playerRepository.GetAllAsync();
+        }
+
         /// <summary>
         /// Método que registra una lista de jugadores inscriptos en el torneo
         /// si cumplen con las validaciones correspondientes.
@@ -80,6 +91,12 @@ namespace AplicationCore.Services
 
             return players.First(); 
         }
+
+        public Task UpdateAsync(Players player)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Criterio adoptado para elegir el ganador o ganadora de
         /// cada ronda. 
