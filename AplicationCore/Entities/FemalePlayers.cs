@@ -17,10 +17,6 @@ namespace AplicationCore.Entities
         [Column("id_female")]
         public int Id_Female { get; set; }
 
-        [Column("name_f")]
-        [MaxLength(150)]
-        public string Name_F { get; set; }
-
         [Column("reaction_time")]
         public double ReactionTime { get; set; }
     }

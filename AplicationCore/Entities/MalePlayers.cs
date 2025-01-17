@@ -17,12 +17,8 @@ namespace AplicationCore.Entities
         [Column("id_male")]
         public int Id_Male {  get; set; }
 
-        [Column("name_m")]
-        [MaxLength(150)]
-        public string Name_M { get; set; }
-
         [Column("strengh")]
-        public double Strengh { get; set; }
+        public double Strength { get; set; }
 
         [Column("speed")]
         public double  Speed { get; set; }

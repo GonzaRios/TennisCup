@@ -27,9 +27,10 @@ namespace Infraestructure.Repositories
             await _playersContext.SaveChangesAsync();
         }
 
-        public async Task AddRangeAsync(IEnumerable<Players> players)
+        public async Task AddRangeAsync(IEnumerable<MalePlayers> malePlayers, IEnumerable<FemalePlayers> femalePlayers)
         {
-            _playersContext.Players.AddRangeAsync(players);
+            _playersContext.MalePlayers.AddRangeAsync(malePlayers);
+            _playersContext.FemalePlayers.AddRangeAsync(femalePlayers);
             await _playersContext.SaveChangesAsync();
         }
 
@@ -51,6 +52,11 @@ namespace Infraestructure.Repositories
         public async Task<IEnumerable<Players>> GetAllAsync()
         {
             return await _playersContext.Players.ToListAsync();
+        }
+
+        public List<Players> GetAllPlayers()
+        {
+           return _playersContext.Players.ToList();
         }
 
         public async Task<Players?> GetByIdAsync(int id)

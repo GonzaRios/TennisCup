@@ -20,14 +20,22 @@ namespace AplicationCore.Context
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Players>()
+                .ToTable("players");
+
+
             builder.Entity<Players>(entity=>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id)
                     .UseIdentityColumn();
-            }
-            
-            );
+            });
+
+            builder.Entity<MalePlayers>()
+                .ToTable("male_players");
+
+            builder.Entity<FemalePlayers>()
+                .ToTable("female_players");
         }
     }
 }

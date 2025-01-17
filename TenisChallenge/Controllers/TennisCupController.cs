@@ -5,6 +5,7 @@ using AplicationCore.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TenisChallenge.WebApi.View;
 
 namespace TenisChallenge.WebApi.Controllers
 {
@@ -12,11 +13,11 @@ namespace TenisChallenge.WebApi.Controllers
     [ApiController]
     public class TennisCupController : ControllerBase
     {
-        private readonly ITournamentService _tournamentService;
+        private readonly ITournamentService _service;
 
-        public TennisCupController(ITournamentService tournamentService)
+        public TennisCupController(ITournamentService service)
         {
-            _tournamentService = tournamentService;
+            _service = service;
         }
 
         [HttpGet("GetAllPlayers")]
@@ -24,8 +25,8 @@ namespace TenisChallenge.WebApi.Controllers
         {
             try
             {
-                await _tournamentService.GetPlayersAsync();
-                return Ok("List of players");
+                var result =_service.GetAllPlayers();
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -33,31 +34,33 @@ namespace TenisChallenge.WebApi.Controllers
             }
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> RegisterPlayers([FromBody] List<Players> players)
+        /// <summary>
+        /// En el siguiente controlador, se ingresa una variable de una clase ViewModel
+        /// que contempla las clases MalePlayers y FemalePlayers y asi poder ingresarlas
+        /// como el cuerpo del request. 
+        /// </summary>
+        /// <param name="requestPlayers"></param>
+        /// <returns></returns>
+        [HttpPost("RegisterAndSimulate")]
+        public async Task<IActionResult> RegisterAndSimulate(
+               [FromBody] TournamentRequest requestPlayers)     //ACLARACIÓN: NO ES NECESARIO INGRESAR LOS ID, DADO A QUE SON AUTO INCREMENTALES.
         {
-            try
-            {
-                await _tournamentService.RegisterPlayersAsync(players);
-                return Ok("Players registered successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+            var malePlayers = requestPlayers.MalePlayers;
+            var femalePlayers = requestPlayers.FemalePlayers;
 
-        [HttpPost("simulate")]
-        public IActionResult SimulateTournament([FromBody] List<Players> players)
-        {
             try
             {
-                var winner = _tournamentService.SimulateTournament(players);
-                return Ok(winner);
+                var (maleChampion, femaleChampion) = await _service.SimulateTournament(malePlayers, femalePlayers);
+
+                return Ok(new
+                {
+                    MaleChampion = maleChampion != null ? new { maleChampion.Id, maleChampion.Name } : null,
+                    FemaleChampion = femaleChampion != null ? new { femaleChampion.Id, femaleChampion.Name } : null
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Message = ex.Message });
             }
         }
     }

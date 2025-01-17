@@ -24,12 +24,6 @@ namespace AplicationCore.Entities
         [MaxLength(50)]
         public string Gender { get; set; }
 
-        [Column("male")]
-        public bool Male{ get; set; }
-
-        [Column("female")]
-        public bool Female { get; set; }
-
         [Column("ability")]
         public int Ability { get; set; }
         

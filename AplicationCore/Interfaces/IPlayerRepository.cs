@@ -10,12 +10,13 @@ namespace AplicationCore.Interfaces
     public interface IPlayerRepository
     {
         Task<IEnumerable<Players>> GetAllAsync();
+        List<Players> GetAllPlayers();
 
         Task<Players?> GetByIdAsync(int id);
 
         Task AddAsync(Players player);
 
-        Task AddRangeAsync(IEnumerable<Players> players);
+        Task AddRangeAsync(IEnumerable<MalePlayers> malePlayers, IEnumerable<FemalePlayers> femalePlayers);
 
         Task UpdateAsync(Players player);
 

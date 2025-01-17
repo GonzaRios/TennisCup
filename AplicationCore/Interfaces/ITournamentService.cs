@@ -9,8 +9,9 @@ namespace AplicationCore.Interfaces
 {
     public interface ITournamentService
     {
-        Task<bool> RegisterPlayersAsync(List<Players> players);
-        Players SimulateTournament(List<Players> players);
+        Task<(MalePlayers? maleChampion, FemalePlayers? femaleChampion)> SimulateTournament(IEnumerable<MalePlayers> malePlayers,
+                                    IEnumerable<FemalePlayers> femalePlayers);
+        List<Players> GetAllPlayers();
         Task GetPlayersAsync();
         Task UpdateAsync(Players player);
         Task DeleteAsync(int id);

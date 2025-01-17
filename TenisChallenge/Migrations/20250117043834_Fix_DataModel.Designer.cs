@@ -2,6 +2,7 @@
 using AplicationCore.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TenisChallenge.WebApi.Migrations
 {
     [DbContext(typeof(PlayersContext))]
-    partial class PlayersContextModelSnapshot : ModelSnapshot
+    [Migration("20250117043834_Fix_DataModel")]
+    partial class Fix_DataModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +72,7 @@ namespace TenisChallenge.WebApi.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("speed");
 
-                    b.Property<double>("Strength")
+                    b.Property<double>("Strengh")
                         .HasColumnType("double precision")
                         .HasColumnName("strengh");
 

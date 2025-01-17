@@ -18,100 +18,92 @@ namespace AplicationCore.Services
             _playerRepository = playerRepository;
         }
 
+        /// <summary>
+        /// Método que recibe dos colecciones de MalePlayers y FemalePlayers respectivamente.
+        /// Luego de validar si los registros son potencias de 2, realiza la simulación del 
+        /// torneo de cada género guardandolo en memoria. Por último, envia las colecciones
+        /// de jugadores/as para percistir en la base de datos y posterior retorno al controlador.
+        /// </summary>
+        /// <param name="players"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<(MalePlayers? maleChampion, FemalePlayers? femaleChampion)> SimulateTournament(
+            IEnumerable<MalePlayers> malePlayers,
+            IEnumerable<FemalePlayers> femalePlayers)
+        {
+            // Validar que las listas sean potencias de 2
+            if (!IsPowerOfTwo(malePlayers.Count()) || !IsPowerOfTwo(femalePlayers.Count()))
+            {
+                throw new InvalidOperationException("El número de jugadores en cada género debe ser una potencia de 2.");
+            }
+
+            var maleChampion = SimulateSingleTournament(malePlayers.ToList(), DetermineMaleWinner);
+            var femaleChampion = SimulateSingleTournament(femalePlayers.ToList(), DetermineFemaleWinner);
+
+            await _playerRepository.AddRangeAsync(malePlayers,femalePlayers);
+
+            return (maleChampion, femaleChampion);
+        }
+
+        private TPlayer SimulateSingleTournament<TPlayer>(
+        List<TPlayer> players,
+        Func<TPlayer, TPlayer, TPlayer> determineWinner)
+        {
+            while (players.Count > 1)
+            {
+                players = SimulateRound(players, determineWinner);
+            }
+            return players.First();
+        }
+
+        private List<TPlayer> SimulateRound<TPlayer>(
+            List<TPlayer> players,
+            Func<TPlayer, TPlayer, TPlayer> determineWinner)
+        {
+            var nextRound = new List<TPlayer>();
+            for (int i = 0; i < players.Count; i += 2)
+            {
+                var winner = determineWinner(players[i], players[i + 1]);
+                nextRound.Add(winner);
+            }
+            return nextRound;
+        }
+
+        private MalePlayers DetermineMaleWinner(MalePlayers player1, MalePlayers player2)
+        {
+            return player1.Strength + player1.Ability >= player2.Strength + player2.Ability ? player1 : player2;
+        }
+
+        private FemalePlayers DetermineFemaleWinner(FemalePlayers player1, FemalePlayers player2)
+        {
+            return player1.Ability+ player1.ReactionTime >= player2.Ability + player2.ReactionTime ? player1 : player2;
+        }
+
+        private bool IsPowerOfTwo(int n)
+        {
+            return (n & (n - 1)) == 0 && n > 0;
+        }
+               
+        public Task UpdateAsync(Players player)
+        {
+            throw new NotImplementedException();
+        }
         public Task DeleteAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public List<Players> GetAllPlayers()
+        {
+            List<Players> lsPlayer = new List<Players>();
+            var listPlayer =  _playerRepository.GetAllPlayers();
+            return listPlayer;
         }
 
         public async Task GetPlayersAsync()
         {
             List<Players> lsPlayer = new List<Players>();
             var listPlayer = await _playerRepository.GetAllAsync();
-        }
-
-        /// <summary>
-        /// Método que registra una lista de jugadores inscriptos en el torneo
-        /// si cumplen con las validaciones correspondientes.
-        /// </summary>
-        /// <param name="players"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
-        public async Task<bool> RegisterPlayersAsync(List<Players> players)
-        {
-            if (players == null || players.Count == 0)
-                throw new ArgumentException("The player list cannot be empty.");
-
-            
-            if ((players.Count & (players.Count - 1)) != 0)
-                throw new InvalidOperationException("The number of players must be a power of 2.");
-
-            
-            if (players.Select(p => p.Gender).Distinct().Count() > 1)
-                throw new InvalidOperationException("All players must have the same gender.");
-
-            
-            if (players.GroupBy(p => p.Id).Any(g => g.Count() > 1))
-                throw new InvalidOperationException("Duplicate players are not allowed.");
-
-            await _playerRepository.AddRangeAsync(players);
-            return true;
-        }
-
-        /// <summary>
-        /// Método que recorre toda la lista de jugadores ingresados e invoca
-        /// al método SimulateMatch para obtener los jugadores que avanzan de
-        /// ronda hasta obtener el campeón o campeona.
-        /// </summary>
-        /// <param name="players"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public Players SimulateTournament(List<Players> players)
-        {
-            if ((players.Count & (players.Count - 1)) != 0)
-                throw new InvalidOperationException("The number of players must be a power of 2.");
-
-            
-            while (players.Count > 1)
-            {
-                var nextRound = new List<Players>();
-
-                for (int i = 0; i < players.Count; i += 2)
-                {
-                    var player1 = players[i];
-                    var player2 = players[i + 1];
-
-                    
-                    var winner = SimulateMatch(player1, player2);
-                    nextRound.Add(winner);
-                }
-
-                players = nextRound;
-            }
-
-            return players.First(); 
-        }
-
-        public Task UpdateAsync(Players player)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Criterio adoptado para elegir el ganador o ganadora de
-        /// cada ronda. 
-        /// </summary>
-        /// <param name="player1"></param>
-        /// <param name="player2"></param>
-        /// <returns></returns>
-        private Players SimulateMatch(Players player1, Players player2)
-        {
-            
-            var random = new Random();
-            int totalSkill = player1.Ability + player2.Ability;
-            int chance = random.Next(0, totalSkill);
-
-            return chance < player1.Ability ? player1 : player2;
         }
     }
 }
